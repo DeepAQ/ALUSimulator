@@ -1,6 +1,6 @@
 /**
  * 模拟ALU进行整数和浮点数的四则运算
- * @author [请将此处修改为“学号_姓名”]
+ * @author 151250091_梁家铭
  *
  */
 
@@ -14,8 +14,47 @@ public class ALU {
 	 * @return number的二进制补码表示，长度为length
 	 */
 	public String integerRepresentation (String number, int length) {
-		// TODO YOUR CODE HERE.
-		return null;
+		// 判断符号，若为负数则去除符号
+		boolean negative = false;
+		if (number.charAt(0) == '-') {
+			negative = true;
+			number = number.substring(1);
+		}
+		// 字符串转为十进制整数
+		int num = Integer.parseInt(number);
+		// 十进制转二进制
+		StringBuilder result = new StringBuilder();
+		while (num > 0) {
+			result.insert(0, num % 2);
+			num /= 2;
+		}
+		// 若位数不足则进行符号扩展
+		while (result.length() < length) {
+			result.insert(0, "0");
+		}
+		// 若位数过多则左移
+		while (result.length() > length) {
+			result.deleteCharAt(0);
+		}
+		// 若输入为负数则取反加1
+		if (negative) {
+			for (int i = result.length() - 1; i >= 0; i--) {
+				if (result.charAt(i) == '0') {
+					result.setCharAt(i, '1');
+				} else {
+					result.setCharAt(i, '0');
+				}
+			}
+			for (int i = result.length() - 1; i >= 0; i--) {
+				if (result.charAt(i) == '0') {
+					result.setCharAt(i, '1');
+					break;
+				} else {
+					result.setCharAt(i, '0');
+				}
+			}
+		}
+		return result.toString();
 	}
 	
 	/**
