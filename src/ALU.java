@@ -206,8 +206,39 @@ public class ALU {
 	 * @return operand的真值。若为负数；则第一位为“-”；若为正数或 0，则无符号位
 	 */
 	public String integerTrueValue (String operand) {
-		// TODO YOUR CODE HERE.
-		return null;
+		String result = "";
+		// 判断负数
+		if (operand.charAt(0) == '1') {
+			result = "-";
+			StringBuilder newOperand = new StringBuilder(operand);
+			// 取反
+			for (int i = newOperand.length() - 1; i >= 0; i--) {
+				if (newOperand.charAt(i) == '0') {
+					newOperand.setCharAt(i, '1');
+				} else {
+					newOperand.setCharAt(i, '0');
+				}
+			}
+			// 加1
+			for (int i = newOperand.length() - 1; i >= 0; i--) {
+				if (newOperand.charAt(i) == '0') {
+					newOperand.setCharAt(i, '1');
+					break;
+				} else {
+					newOperand.setCharAt(i, '0');
+				}
+			}
+			operand = newOperand.toString();
+		}
+		// 转换为十进制
+		int trueValue = 0;
+		for (int i = operand.length() - 1; i >= 0; i--) {
+			if (operand.charAt(i) == '1') {
+				trueValue += Math.pow(2, operand.length() - i - 1);
+			}
+		}
+		result = result + Integer.toString(trueValue);
+		return result;
 	}
 	
 	/**
