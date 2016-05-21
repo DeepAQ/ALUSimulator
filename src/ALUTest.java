@@ -4,6 +4,6 @@
 public class ALUTest {
     public static void main(String[] args) {
         ALU alu = new ALU();
-        System.out.println(alu.integerRepresentation("-128", 8));
+        System.out.println(alu.ieee754("-2016.2016", 64));
     }
 }

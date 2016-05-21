@@ -38,6 +38,7 @@ public class ALU {
 		}
 		// 若输入为负数则取反加1
 		if (negative) {
+			// 取反
 			for (int i = result.length() - 1; i >= 0; i--) {
 				if (result.charAt(i) == '0') {
 					result.setCharAt(i, '1');
@@ -45,6 +46,7 @@ public class ALU {
 					result.setCharAt(i, '0');
 				}
 			}
+			// 加1
 			for (int i = result.length() - 1; i >= 0; i--) {
 				if (result.charAt(i) == '0') {
 					result.setCharAt(i, '1');
@@ -68,8 +70,114 @@ public class ALU {
 	 * @return number的二进制表示，长度为 1+eLength+sLength。从左向右，依次为符号、指数（移码表示）、尾数（首位隐藏）
 	 */
 	public String floatRepresentation (String number, int eLength, int sLength) {
-		// TODO YOUR CODE HERE.
-		return null;
+		int sign = 0;
+		String exponent = "";
+		String fraction = "";
+		// 判断符号
+		if (number.charAt(0) == '-') {
+			sign = 1;
+			number = number.substring(1);
+		}
+		else if (number.charAt(0) == '+') {
+			number = number.substring(1);
+		}
+		// 判断无穷
+		if (number.equals("Inf")) {
+			// 指数全填充为1
+			for (int i = 0; i < eLength; i++) {
+				exponent = exponent + "1";
+			}
+			// 尾数全填充为0
+			for (int i = 0; i < sLength; i++) {
+				fraction = fraction + "0";
+			}
+		}
+		// 判断NaN
+		else if (number.equals("NaN")) {
+			// 指数全填充为1
+			for (int i = 0; i < eLength; i++) {
+				exponent = exponent + "1";
+			}
+			// 尾数全填充为1
+			for (int i = 0; i < sLength; i++) {
+				fraction = fraction + "1";
+			}
+		}
+		// 判断0
+		else if (number.equals("0")) {
+			// 指数全填充为0
+			for (int i = 0; i < eLength; i++) {
+				exponent = exponent + "0";
+			}
+			// 尾数全填充为0
+			for (int i = 0; i < sLength; i++) {
+				fraction = fraction + "0";
+			}
+		}
+		else {
+			// 将浮点数转为二进制
+			String intBin = "";
+			String decBin = "";
+			String[] parts = number.split("\\.");
+			int intNum = Integer.parseInt(parts[0]);
+			double decNum = 0;
+			if (parts.length > 1) {
+				decNum = Double.parseDouble("0." + parts[1]);
+			}
+			while (intNum > 0) {
+				intBin = (intNum % 2) + intBin;
+				intNum /= 2;
+			}
+			while (decNum > 0) {
+				decNum *= 2;
+				if (decNum >= 1) {
+					decNum -= 1;
+					decBin = decBin + "1";
+				} else {
+					decBin = decBin + "0";
+				}
+			}
+			System.out.println(intBin + "." + decBin);
+			// 计算尾数
+			int exponentNum = 0;
+			if (intBin.indexOf('1') >= 0) {
+				// 小数点左移
+				fraction = intBin.substring(intBin.indexOf('1') + 1) + decBin;
+				exponentNum = intBin.length() - intBin.indexOf('1') - 1;
+			}
+			else if (decBin.indexOf('1') >= 0) {
+				// 小数点右移
+				fraction = decBin.substring(decBin.indexOf('1') + 1);
+				exponentNum = -1 - decBin.indexOf('1');
+			}
+			// 计算指数移码
+			exponentNum += Math.pow(2, eLength - 1) - 1;
+			if (exponentNum > 0) {
+				// 规格化
+				exponent = integerRepresentation(Integer.toString(exponentNum), eLength);
+			} else {
+				// 非规格化
+				fraction = "1" + fraction;
+				// 指数全填充为0
+				for (int i = 0; i < eLength; i++) {
+					exponent = exponent + "0";
+				}
+				while (exponentNum < 0) {
+					// 小数点左移
+					fraction = "0" + fraction;
+					exponentNum++;
+				}
+			}
+			// 确定尾数位数
+			while (fraction.length() < sLength) {
+				fraction = fraction + "0";
+			}
+			while (fraction.length() > sLength) {
+				// 向0舍入
+				fraction = fraction.substring(0, fraction.length() - 1);
+			}
+		}
+		return sign + exponent + fraction;
 	}
 	
 	/**
@@ -80,8 +188,15 @@ public class ALU {
 	 * @return number的IEEE 754表示，长度为length。从左向右，依次为符号、指数（移码表示）、尾数（首位隐藏）
 	 */
 	public String ieee754 (String number, int length) {
-		// TODO YOUR CODE HERE.
-		return null;
+		if (length == 32) {
+			return floatRepresentation(number, 8, 23);
+		}
+		else if (length == 64) {
+			return floatRepresentation(number, 11, 52);
+		}
+		else {
+			return null;
+		}
 	}
 	
 	/**
