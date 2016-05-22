@@ -1,3 +1,6 @@
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * 模拟ALU进行整数和浮点数的四则运算
  * @author 151250091_梁家铭
@@ -21,7 +24,7 @@ public class ALU {
 			number = number.substring(1);
 		}
 		// 字符串转为十进制整数
-		int num = Integer.parseInt(number);
+		long num = Long.parseLong(number);
 		// 十进制转二进制
 		StringBuilder result = new StringBuilder();
 		while (num > 0) {
@@ -119,7 +122,7 @@ public class ALU {
 			String intBin = "";
 			String decBin = "";
 			String[] parts = number.split("\\.");
-			int intNum = Integer.parseInt(parts[0]);
+			long intNum = Long.parseLong(parts[0]);
 			double decNum = 0;
 			if (parts.length > 1) {
 				decNum = Double.parseDouble("0." + parts[1]);
@@ -137,9 +140,8 @@ public class ALU {
 					decBin = decBin + "0";
 				}
 			}
-			System.out.println(intBin + "." + decBin);
 			// 计算尾数
-			int exponentNum = 0;
+			long exponentNum = 0;
 			if (intBin.indexOf('1') >= 0) {
 				// 小数点左移
 				fraction = intBin.substring(intBin.indexOf('1') + 1) + decBin;
@@ -154,7 +156,7 @@ public class ALU {
 			exponentNum += Math.pow(2, eLength - 1) - 1;
 			if (exponentNum > 0) {
 				// 规格化
-				exponent = integerRepresentation(Integer.toString(exponentNum), eLength);
+				exponent = integerRepresentation(Long.toString(exponentNum), eLength);
 			} else {
 				// 非规格化
 				fraction = "1" + fraction;
@@ -206,39 +208,18 @@ public class ALU {
 	 * @return operand的真值。若为负数；则第一位为“-”；若为正数或 0，则无符号位
 	 */
 	public String integerTrueValue (String operand) {
-		String result = "";
+		long trueValue = 0;
 		// 判断负数
 		if (operand.charAt(0) == '1') {
-			result = "-";
-			StringBuilder newOperand = new StringBuilder(operand);
-			// 取反
-			for (int i = newOperand.length() - 1; i >= 0; i--) {
-				if (newOperand.charAt(i) == '0') {
-					newOperand.setCharAt(i, '1');
-				} else {
-					newOperand.setCharAt(i, '0');
-				}
-			}
-			// 加1
-			for (int i = newOperand.length() - 1; i >= 0; i--) {
-				if (newOperand.charAt(i) == '0') {
-					newOperand.setCharAt(i, '1');
-					break;
-				} else {
-					newOperand.setCharAt(i, '0');
-				}
-			}
-			operand = newOperand.toString();
+			trueValue = (long) -Math.pow(2, operand.length() - 1);
 		}
 		// 转换为十进制
-		int trueValue = 0;
-		for (int i = operand.length() - 1; i >= 0; i--) {
+		for (int i = 1; i < operand.length(); i++) {
 			if (operand.charAt(i) == '1') {
 				trueValue += Math.pow(2, operand.length() - i - 1);
 			}
 		}
-		result = result + Integer.toString(trueValue);
-		return result;
+		return Long.toString(trueValue);
 	}
 	
 	/**
@@ -250,8 +231,44 @@ public class ALU {
 	 * @return operand的真值。若为负数；则第一位为“-”；若为正数或 0，则无符号位。正负无穷分别表示为“+Inf”和“-Inf”， NaN表示为“NaN”
 	 */
 	public String floatTrueValue (String operand, int eLength, int sLength) {
-		// TODO YOUR CODE HERE.
-		return null;
+		// 判断符号位
+		boolean negative = false;
+		if (operand.charAt(0) == '1') {
+			negative = true;
+		}
+		String exponent = operand.substring(1, 1 + eLength);
+		String fraction = operand.substring(1 + eLength, 1 + eLength + sLength);
+		long expNum = Long.parseLong(integerTrueValue("0" + exponent)); // - (int) Math.pow(2, eLength - 1) + 1;
+		long fracNum = Long.parseLong(integerTrueValue("0" + fraction));
+		if (expNum == Math.pow(2, eLength) - 1) {
+			// 无穷大 或 NaN
+			if (fracNum == 0) {
+				if (negative) return "-Inf";
+				else return "+Inf";
+			} else {
+				return "NaN";
+			}
+		}
+		else if (expNum == 0) {
+			// 0 或 非规格化数
+			if (fracNum == 0) {
+				return "0";
+			} else {
+				// 先计算 0.fraction
+				double result = fracNum * Math.pow(2, -sLength);
+				result = result * Math.pow(2, 2 - Math.pow(2, eLength - 1));
+				if (negative) result = -result;
+				return Double.toString(result);
+			}
+		}
+		else {
+			// 规格化数
+			fracNum = Long.parseLong(integerTrueValue("01" + fraction));
+			double result = fracNum * Math.pow(2, -sLength);
+			result = result * Math.pow(2, expNum - Math.pow(2, eLength - 1) + 1);
+			if (negative) result = -result;
+			return Double.toString(result);
+		}
 	}
 	
 	/**
