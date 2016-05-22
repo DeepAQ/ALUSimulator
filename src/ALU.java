@@ -381,8 +381,26 @@ public class ALU {
 	 * @return 长度为5的字符串表示的计算结果，其中第1位是最高位进位，后4位是相加结果，其中进位不可以由循环获得
 	 */
 	public String claAdder (String operand1, String operand2, char c) {
-		// TODO YOUR CODE HERE.
-		return null;
+		int length = operand1.length();
+		// 先计算所有 Pi, Gi
+		char[] p = new char[length];
+		char[] g = new char[length];
+		for (int i = 0; i < length; i++) {
+			p[i] = or(operand1.charAt(i), operand2.charAt(i));
+			g[i] = and(operand1.charAt(i), operand2.charAt(i));
+		}
+		// 计算所有 Ci
+		char[] carry = new char[length + 1];
+		carry[length] = c;
+		for (int i = length - 1; i >= 0; i--) {
+			carry[i] = or(g[i], and(p[i], carry[i+1]));
+		}
+		// 计算结果
+		String result = carry[0] + "";
+		for (int i = 0; i < length; i++) {
+			result = result + fullAdder(operand1.charAt(i), operand2.charAt(i), carry[i+1]).substring(1);
+		}
+		return result;
 	}
 	
 	/**

@@ -13,6 +13,6 @@ public class ALUTest {
             System.out.println(alu.floatRepresentation(Double.toString(randNum), 11, 52));
             System.out.println(randNum + " " + result + " " + result.equals(Double.toString(randNum)));
         }*/
-        System.out.println(alu.fullAdder('1', '1', '1'));
+        System.out.println(alu.claAdder("1001", "0001", '1'));
     }
 }
