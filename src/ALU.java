@@ -285,8 +285,7 @@ public class ALU {
 
 	private char not(char c) {
 		if (c == '0') return '1';
-		if (c == '1') return '0';
-		return 0;
+		else return '0';
 	}
 	
 	/**
@@ -353,8 +352,24 @@ public class ALU {
 	 * @return 相加的结果，用长度为2的字符串表示，第1位表示进位，第2位表示和
 	 */
 	public String fullAdder (char x, char y, char c) {
-		// TODO YOUR CODE HERE.
-		return null;
+		char sum = xor(xor(x, y), c);
+		char carry = or(or(and(x, c), and(y, c)), and(x, y));
+		return new StringBuilder().append(carry).append(sum).toString();
+	}
+
+	private char and(char x, char y) {
+		if (x == '1' && y == '1') return '1';
+		else return '0';
+	}
+
+	private char or(char x, char y) {
+		if (x == '0' && y == '0') return '0';
+		else return '1';
+	}
+
+	private char xor(char x, char y) {
+		if (x == y) return '0';
+		else return '1';
 	}
 	
 	/**
