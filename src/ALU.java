@@ -391,10 +391,11 @@ public class ALU {
 		}
 		// 计算所有 Ci
 		char[] carry = new char[length + 1];
-		carry[length] = c;
-		for (int i = length - 1; i >= 0; i--) {
-			carry[i] = or(g[i], and(p[i], carry[i+1]));
-		}
+		carry[4] = c;
+		carry[3] = or(g[3], and(p[3], c));
+		carry[2] = or(g[2], and(p[2], or(g[3], and(p[3], c))));
+		carry[1] = or(g[1], and(p[1], or(g[2], and(p[2], or(g[3], and(p[3], c))))));
+		carry[0] = or(g[0], and(p[0], or(g[1], and(p[1], or(g[2], and(p[2], or(g[3], and(p[3], c))))))));
 		// 计算结果
 		String result = carry[0] + "";
 		for (int i = 0; i < length; i++) {
@@ -415,8 +416,26 @@ public class ALU {
 	 * @return operand加1的结果，长度为operand的长度加1，其中第1位指示是否溢出（溢出为1，否则为0），其余位为相加结果
 	 */
 	public String oneAdder (String operand) {
-		// TODO YOUR CODE HERE.
-		return null;
+		StringBuilder result = new StringBuilder(operand);
+		char carry = '0';
+		for (int i = result.length() - 1; i >= 0; i--) {
+			char x;
+			if (i == result.length() - 1) {
+				x = '1';
+			} else {
+				x = '0';
+			}
+			char sum = xor(xor(operand.charAt(i), x), carry);
+			carry = or(or(and(operand.charAt(i), carry), and(x, carry)), and(operand.charAt(i), x));
+			result.setCharAt(i, sum);
+		}
+		// 判断是否溢出
+		if (result.charAt(0) != operand.charAt(0)) {
+			result.insert(0, '1');
+		} else {
+			result.insert(0, '0');
+		}
+		return result.toString();
 	}
 	
 	/**
