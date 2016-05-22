@@ -278,8 +278,18 @@ public class ALU {
 	 * @return operand按位取反的结果
 	 */
 	public String negation (String operand) {
-		// TODO YOUR CODE HERE.
-		return null;
+		StringBuilder result = new StringBuilder(operand);
+		for (int i = 0; i < result.length(); i++) {
+			// 调用非门
+			result.setCharAt(i, not(result.charAt(i)));
+		}
+		return result.toString();
+	}
+
+	private char not(char c) {
+		if (c == '0') return '1';
+		if (c == '1') return '0';
+		return 0;
 	}
 	
 	/**
