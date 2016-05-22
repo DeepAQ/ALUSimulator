@@ -300,8 +300,14 @@ public class ALU {
 	 * @return operand左移n位的结果
 	 */
 	public String leftShift (String operand, int n) {
-		// TODO YOUR CODE HERE.
-		return null;
+		StringBuilder result = new StringBuilder(operand);
+		int i = n;
+		while (i > 0) {
+			result.deleteCharAt(0);
+			result.append("0");
+			i--;
+		}
+		return result.toString();
 	}
 	
 	/**
