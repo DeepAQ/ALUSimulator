@@ -150,7 +150,7 @@ public class ALU {
 				exponentNum = -1 - decBin.indexOf('1');
 			}
 			// 计算指数移码
-			exponentNum += Math.pow(2, eLength - 1) - 1;
+			exponentNum += (long) (Math.pow(2, eLength - 1) - 1);
 			if (exponentNum > 0) {
 				// 规格化
 				exponent = integerRepresentation(Long.toString(exponentNum), eLength);
@@ -213,7 +213,7 @@ public class ALU {
 		// 转换为十进制
 		for (int i = 1; i < operand.length(); i++) {
 			if (operand.charAt(i) == '1') {
-				trueValue += Math.pow(2, operand.length() - i - 1);
+				trueValue += (long) Math.pow(2, operand.length() - i - 1);
 			}
 		}
 		return Long.toString(trueValue);
@@ -237,7 +237,7 @@ public class ALU {
 		String fraction = operand.substring(1 + eLength, 1 + eLength + sLength);
 		long expNum = Long.parseLong(integerTrueValue("0" + exponent)); // - (int) Math.pow(2, eLength - 1) + 1;
 		long fracNum = Long.parseLong(integerTrueValue("0" + fraction));
-		if (expNum == Math.pow(2, eLength) - 1) {
+		if (expNum == (long) (Math.pow(2, eLength) - 1)) {
 			// 无穷大 或 NaN
 			if (fracNum == 0) {
 				if (negative) return "-Inf";
@@ -486,8 +486,9 @@ public class ALU {
 	 * @return 长度为length+1的字符串表示的计算结果，其中第1位指示是否溢出（溢出为1，否则为0），后length位是相减结果
 	 */
 	public String integerSubtraction (String operand1, String operand2, int length) {
-		// TODO YOUR CODE HERE.
-		return null;
+		// 对减数取反加一
+		operand2 = oneAdder(negation(operand2)).substring(1);
+		return adder(operand1, operand2, '0', length);
 	}
 	
 	/**
