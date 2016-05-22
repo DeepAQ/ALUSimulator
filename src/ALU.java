@@ -1,6 +1,3 @@
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
 /**
  * 模拟ALU进行整数和浮点数的四则运算
  * @author 151250091_梁家铭
@@ -318,20 +315,33 @@ public class ALU {
 	 * @return operand逻辑右移n位的结果
 	 */
 	public String logRightShift (String operand, int n) {
-		// TODO YOUR CODE HERE.
-		return null;
+		StringBuilder result = new StringBuilder(operand);
+		int i = n;
+		while (i > 0) {
+			result.deleteCharAt(result.length() - 1);
+			result.insert(0, '0');
+			i--;
+		}
+		return result.toString();
 	}
 	
 	/**
 	 * 算术右移操作。<br/>
-	 * 例：logRightShift("11110110", 2)
+	 * 例：ariRightShift("11110110", 2)
 	 * @param operand 二进制表示的操作数
 	 * @param n 右移的位数
 	 * @return operand算术右移n位的结果
 	 */
 	public String ariRightShift (String operand, int n) {
-		// TODO YOUR CODE HERE.
-		return null;
+		StringBuilder result = new StringBuilder(operand);
+		int i = n;
+		char sign = operand.charAt(0);
+		while (i > 0) {
+			result.deleteCharAt(result.length() - 1);
+			result.insert(0, sign);
+			i--;
+		}
+		return result.toString();
 	}
 	
 	/**
