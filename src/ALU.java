@@ -381,16 +381,15 @@ public class ALU {
 	 * @return 长度为5的字符串表示的计算结果，其中第1位是最高位进位，后4位是相加结果，其中进位不可以由循环获得
 	 */
 	public String claAdder (String operand1, String operand2, char c) {
-		int length = operand1.length();
 		// 先计算所有 Pi, Gi
-		char[] p = new char[length];
-		char[] g = new char[length];
-		for (int i = 0; i < length; i++) {
+		char[] p = new char[4];
+		char[] g = new char[4];
+		for (int i = 0; i < 4; i++) {
 			p[i] = or(operand1.charAt(i), operand2.charAt(i));
 			g[i] = and(operand1.charAt(i), operand2.charAt(i));
 		}
 		// 计算所有 Ci
-		char[] carry = new char[length + 1];
+		char[] carry = new char[5];
 		carry[4] = c;
 		carry[3] = or(g[3], and(p[3], c));
 		carry[2] = or(g[2], and(p[2], or(g[3], and(p[3], c))));
@@ -398,7 +397,7 @@ public class ALU {
 		carry[0] = or(g[0], and(p[0], or(g[1], and(p[1], or(g[2], and(p[2], or(g[3], and(p[3], c))))))));
 		// 计算结果
 		String result = carry[0] + "";
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < 4; i++) {
 			result = result + fullAdder(operand1.charAt(i), operand2.charAt(i), carry[i+1]).substring(1);
 		}
 		return result;
@@ -416,31 +415,27 @@ public class ALU {
 	 * @return operand加1的结果，长度为operand的长度加1，其中第1位指示是否溢出（溢出为1，否则为0），其余位为相加结果
 	 */
 	public String oneAdder (String operand) {
-		StringBuilder result = new StringBuilder(operand);
+		String result = "";
 		char carry = '0';
-		for (int i = result.length() - 1; i >= 0; i--) {
+		for (int i = operand.length() - 1; i >= 0; i--) {
 			char x;
-			if (i == result.length() - 1) {
+			if (i == operand.length() - 1) {
 				x = '1';
 			} else {
 				x = '0';
 			}
 			char sum = xor(xor(operand.charAt(i), x), carry);
 			carry = or(or(and(operand.charAt(i), carry), and(x, carry)), and(operand.charAt(i), x));
-			result.setCharAt(i, sum);
+			result = sum + result;
 		}
 		// 判断是否溢出
-		if (result.charAt(0) != operand.charAt(0)) {
-			result.insert(0, '1');
-		} else {
-			result.insert(0, '0');
-		}
-		return result.toString();
+		char overflow = and(and(not(operand.charAt(0)), '1'), result.charAt(0));
+		return overflow + result;
 	}
 	
 	/**
 	 * 加法器，要求调用{@link #claAdder(String, String, char)}方法实现。<br/>
-	 * 例：adder("0100", "0011", ‘0’, 8)
+	 * 例：adder("0100", "0011", '0', 8)
 	 * @param operand1 二进制补码表示的被加数
 	 * @param operand2 二进制补码表示的加数
 	 * @param c 最低位进位
@@ -448,8 +443,26 @@ public class ALU {
 	 * @return 长度为length+1的字符串表示的计算结果，其中第1位指示是否溢出（溢出为1，否则为0），后length位是相加结果
 	 */
 	public String adder (String operand1, String operand2, char c, int length) {
-		// TODO YOUR CODE HERE.
-				return null;
+		// 若操作数的长度小于length则进行符号扩展
+		char sign1 = operand1.charAt(0);
+		while (operand1.length() < length) {
+			operand1 = sign1 + operand1;
+		}
+		char sign2 = operand2.charAt(0);
+		while (operand2.length() < length) {
+			operand2 = sign2 + operand2;
+		}
+		String result = "";
+		char carry = c;
+		for (int i = length/4 - 1; i >= 0; i--) {
+			String tmpResult = claAdder(operand1.substring(4*i, 4*i+4), operand2.substring(4*i, 4*i+4), carry);
+			carry = tmpResult.charAt(0);
+			result = tmpResult.substring(1) + result;
+		}
+		// 判断是否溢出
+		char overflow = or(and(and(operand1.charAt(0), operand2.charAt(0)), not(result.charAt(0))),
+				and(and(not(operand1.charAt(0)), not(operand2.charAt(0))), result.charAt(0)));
+		return overflow + result;
 	}
 	
 	/**
@@ -461,8 +474,7 @@ public class ALU {
 	 * @return 长度为length+1的字符串表示的计算结果，其中第1位指示是否溢出（溢出为1，否则为0），后length位是相加结果
 	 */
 	public String integerAddition (String operand1, String operand2, int length) {
-		// TODO YOUR CODE HERE.
-		return null;
+		return adder(operand1, operand2, '0', length);
 	}
 	
 	/**
