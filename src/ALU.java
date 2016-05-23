@@ -500,8 +500,39 @@ public class ALU {
 	 * @return 长度为length+1的字符串表示的相乘结果，其中第1位指示是否溢出（溢出为1，否则为0），后length位是相乘结果
 	 */
 	public String integerMultiplication (String operand1, String operand2, int length) {
-		// TODO YOUR CODE HERE.
-		return null;
+		// 若操作数的长度小于length则进行符号扩展
+		char sign1 = operand1.charAt(0);
+		while (operand1.length() < length) {
+			operand1 = sign1 + operand1;
+		}
+		char sign2 = operand2.charAt(0);
+		while (operand2.length() < length) {
+			operand2 = sign2 + operand2;
+		}
+		// 填充结果及Y
+		String prod = integerRepresentation("0", length);
+		StringBuilder y = new StringBuilder(operand2 + "0");
+		for (int i = 0; i < length; i++) {
+			switch (y.charAt(y.length() - 1) - y.charAt(y.length() - 2)) {
+				case 1:
+					prod = integerAddition(prod, operand1, length).substring(1);
+					break;
+				case -1:
+					prod = integerSubtraction(prod, operand1, length).substring(1);
+					break;
+			}
+			// 右移
+			y.deleteCharAt(y.length() - 1);
+			y.insert(0, prod.charAt(prod.length() - 1));
+			prod = ariRightShift(prod, 1);
+		}
+		y.deleteCharAt(y.length() - 1);
+		// 判断是否溢出
+		char overflow = '1';
+		if (ariRightShift(prod, length).equals(prod) && prod.charAt(0) == y.charAt(0)) {
+			overflow = '0';
+		}
+		return overflow + y.toString();
 	}
 	
 	/**
@@ -528,8 +559,21 @@ public class ALU {
 	 * @return 长度为length+2的字符串表示的计算结果，其中第1位指示是否溢出（溢出为1，否则为0），第2位为符号位，后length位是相加结果
 	 */
 	public String signedAddition (String operand1, String operand2, int length) {
-		// TODO YOUR CODE HERE.
-		return null;
+		char signdiff = xor(operand1.charAt(0), operand2.charAt(0));
+		// 若为负数则取反
+		if (operand1.charAt(0) == '1') {
+			operand1 = negation(operand1);
+		}
+		if (operand2.charAt(0) == '1') {
+			operand2 = negation(operand2);
+		}
+		// 去除符号位
+		operand1.substring(1);
+		operand2.substring(1);
+		StringBuilder result = new StringBuilder();
+		result.append(adder(operand1, operand2, signdiff, length));
+		// TODO confused.
+		return result.toString();
 	}
 	
 	/**
