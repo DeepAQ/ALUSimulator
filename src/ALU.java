@@ -544,8 +544,63 @@ public class ALU {
 	 * @return 长度为2*length+1的字符串表示的相除结果，其中第1位指示是否溢出（溢出为1，否则为0），其后length位为商，最后length位为余数
 	 */
 	public String integerDivision (String operand1, String operand2, int length) {
-		// TODO YOUR CODE HERE.
-		return null;
+		String result = "";
+		// 预处理
+		String xValue = integerTrueValue(operand1);
+		String yValue = integerTrueValue(operand2);
+		if (yValue.equals("0")) {
+			return "NaN";
+		} else if (xValue.equals("0")) {
+			while (result.length() < 2*length+1) {
+				result = result + "0";
+			}
+		} else {
+			// 若操作数的长度小于length则进行符号扩展
+			char sign1 = operand1.charAt(0);
+			while (operand1.length() < length) {
+				operand1 = sign1 + operand1;
+			}
+			char sign2 = operand2.charAt(0);
+			while (operand2.length() < length) {
+				operand2 = sign2 + operand2;
+			}
+			String remainder = "";
+			String quotient = operand1;
+			while (remainder.length() < length) {
+				remainder = remainder + sign1;
+			}
+			for (int i = 0; i <= length; i++) {
+				if (remainder.charAt(0) == operand2.charAt(0)) {
+					remainder = integerSubtraction(remainder, operand2, length).substring(1);
+				} else {
+					remainder = integerAddition(remainder, operand2, length).substring(1);
+				}
+				// 填充商
+				if (remainder.charAt(0) == operand2.charAt(0)) {
+					quotient = quotient + "1";
+				} else {
+					quotient = quotient + "0";
+				}
+				// 左移
+				if (i != length) {
+					remainder = remainder.substring(1) + quotient.charAt(0);
+				}
+				quotient = quotient.substring(1);
+			}
+			// TODO: fuck rtw
+			// 商的修正
+			if (quotient.charAt(0) != operand2.charAt(0)) {
+				quotient = oneAdder(quotient).substring(1);
+			}
+			// 余数的修正
+			if (remainder.charAt(0) == operand2.charAt(0)) {
+				remainder = integerSubtraction(remainder, operand2, length).substring(1);
+			} else {
+				remainder = integerAddition(remainder, operand2, length).substring(1);
+			}
+			result = "0" + quotient + remainder;
+		}
+		return result;
 	}
 	
 	/**
