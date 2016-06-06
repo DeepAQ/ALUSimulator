@@ -570,7 +570,13 @@ public class ALU {
 				remainder = remainder + sign1;
 			}
 			for (int i = 0; i <= length; i++) {
-				if (remainder.charAt(0) == operand2.charAt(0)) {
+				char oldsign = remainder.charAt(0);
+				// 左移
+				if (i > 0) {
+					remainder = remainder.substring(1) + quotient.charAt(0);
+					quotient = quotient.substring(1);
+				}
+				if (oldsign == operand2.charAt(0)) {
 					remainder = integerSubtraction(remainder, operand2, length).substring(1);
 				} else {
 					remainder = integerAddition(remainder, operand2, length).substring(1);
@@ -581,22 +587,19 @@ public class ALU {
 				} else {
 					quotient = quotient + "0";
 				}
-				// 左移
-				if (i != length) {
-					remainder = remainder.substring(1) + quotient.charAt(0);
-				}
-				quotient = quotient.substring(1);
+
 			}
-			// TODO: fuck rtw
-			// 商的修正
-			if (quotient.charAt(0) != operand2.charAt(0)) {
+			// 商和余数的修正
+			quotient = quotient.substring(1);
+			if (quotient.charAt(0) == '1') {
 				quotient = oneAdder(quotient).substring(1);
 			}
-			// 余数的修正
-			if (remainder.charAt(0) == operand2.charAt(0)) {
-				remainder = integerSubtraction(remainder, operand2, length).substring(1);
-			} else {
-				remainder = integerAddition(remainder, operand2, length).substring(1);
+			if (remainder.charAt(0) != operand1.charAt(0)) {
+				if (operand1.charAt(0) == operand2.charAt(0)) {
+					remainder = integerAddition(remainder, operand2, length).substring(1);
+				} else {
+					remainder = integerSubtraction(remainder, operand2, length).substring(1);
+				}
 			}
 			result = "0" + quotient + remainder;
 		}

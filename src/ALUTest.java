@@ -8,18 +8,21 @@ public class ALUTest {
         ALU alu = new ALU();
         Random rand = new Random();
         for (int i = 0; i < 100; i++) {
-            int randNum1 = rand.nextInt(65535) - 32768;
-            int randNum2 = rand.nextInt(65535) - 32768;
-            int result = randNum1 * randNum2;
-            String result2 = alu.integerTrueValue(
-                    alu.integerMultiplication(
-                            alu.integerRepresentation(Integer.toString(randNum1), 16),
-                            alu.integerRepresentation(Integer.toString(randNum2), 16),
-                            32
-                    ).substring(1)
-            );
-            System.out.println(randNum1 + "*" + randNum2 + "=" + result + " | " + result2 + " | " + Integer.toString(result).equals(result2));
+            long randNum1 = rand.nextLong();
+            long randNum2 = rand.nextInt();
+            if (randNum2 == 0) continue;
+            long q1 = randNum1 / randNum2;
+            long r1 = randNum1 % randNum2;
+            String result2 = alu.integerDivision(
+                    alu.integerRepresentation(Long.toString(randNum1), 64),
+                    alu.integerRepresentation(Long.toString(randNum2), 64),
+                    64
+            ).substring(1);
+            String q2 = alu.integerTrueValue(result2.substring(0, 64));
+            String r2 = alu.integerTrueValue(result2.substring(64));
+            System.out.println(randNum1 + "/" + randNum2 + " = " + q1 + "..." + r1 + " | " + q2 + "..." + r2
+                    + " | " + (Long.toString(q1).equals(q2)&&Long.toString(r1).equals(r2)));
         }
-        //System.out.println(alu.adder("01111111", "00000000", '1', 8));
+        System.out.println(alu.integerDivision(alu.integerRepresentation("-6", 4), alu.integerRepresentation("3", 4), 4));
     }
 }
