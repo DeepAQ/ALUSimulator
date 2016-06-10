@@ -601,7 +601,14 @@ public class ALU {
 					remainder = integerSubtraction(remainder, operand2, length).substring(1);
 				}
 			}
-			result = "0" + quotient + remainder;
+			// ÅĞ¶ÏÒç³ö
+			if (remainder.equals(operand2)) {
+				quotient = oneAdder(quotient).substring(1);
+				remainder = integerSubtraction(remainder, operand2, length).substring(1);
+				result = "1" + quotient + remainder;
+			} else {
+				result = "0" + quotient + remainder;
+			}
 		}
 		return result;
 	}

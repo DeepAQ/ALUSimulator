@@ -23,6 +23,6 @@ public class ALUTest {
             System.out.println(randNum1 + "/" + randNum2 + " = " + q1 + "..." + r1 + " | " + q2 + "..." + r2
                     + " | " + (Long.toString(q1).equals(q2)&&Long.toString(r1).equals(r2)));
         }
-        System.out.println(alu.integerDivision(alu.integerRepresentation("-6", 4), alu.integerRepresentation("3", 4), 4));
+        System.out.println(alu.integerDivision(alu.integerRepresentation("-8", 4), alu.integerRepresentation("-1", 4), 4));
     }
 }
