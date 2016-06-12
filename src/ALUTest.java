@@ -24,7 +24,7 @@ public class ALUTest {
                     + " | " + (Long.toString(q1).equals(q2)&&Long.toString(r1).equals(r2)));
         }*/
         //System.out.println(alu.integerDivision(alu.integerRepresentation("-8", 4), alu.integerRepresentation("-1", 4), 4));
-        for (int i = 0; i < 100; i++) {
+        /*for (int i = 0; i < 100; i++) {
             double randNum1 = rand.nextDouble() * rand.nextInt(999);
             double randNum2 = rand.nextDouble() * rand.nextInt(999);
             double result = randNum1 - randNum2;
@@ -35,7 +35,19 @@ public class ALUTest {
                     11, 52, 4
             ).substring(1);
             System.out.println(resultString.substring(0, 50).equals(result2.substring(0, 50)) + " | " + randNum1 + " " + randNum2 + " | " + resultString + " | " + result2);
+        }*/
+        for (int i = 0; i < 100; i++) {
+            double randNum1 = rand.nextDouble() * rand.nextInt(999);
+            double randNum2 = rand.nextDouble() * rand.nextInt(999);
+            double result = randNum1 * randNum2;
+            String resultString = alu.ieee754(Double.toString(result), 64);
+            String result2 = alu.floatMultiplication(
+                    alu.ieee754(Double.toString(randNum1), 64),
+                    alu.ieee754(Double.toString(randNum2), 64),
+                    11, 52
+            ).substring(1);
+            System.out.println(resultString.substring(0, 50).equals(result2.substring(0, 50)) + " | " + randNum1 + " " + randNum2 + " | " + resultString + " | " + result2);
         }
-
+        System.out.println(alu.floatMultiplication("0100000000000", "0100010000000", 4, 8));
     }
 }
