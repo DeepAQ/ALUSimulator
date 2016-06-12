@@ -23,38 +23,22 @@ public class ALU {
 		// 字符串转为十进制整数
 		long num = Long.parseLong(number);
 		// 十进制转二进制
-		StringBuilder result = new StringBuilder();
+		String result = "";
 		while (num > 0) {
-			result.insert(0, num % 2);
+			result = (num % 2) + result;
 			num /= 2;
 		}
 		// 若位数不足则进行符号扩展
 		while (result.length() < length) {
-			result.insert(0, "0");
+			result = "0" + result;
 		}
 		// 若位数过多则左移
 		while (result.length() > length) {
-			result.deleteCharAt(0);
+			result = result.substring(1);
 		}
 		// 若输入为负数则取反加1
 		if (negative) {
-			// 取反
-			for (int i = result.length() - 1; i >= 0; i--) {
-				if (result.charAt(i) == '0') {
-					result.setCharAt(i, '1');
-				} else {
-					result.setCharAt(i, '0');
-				}
-			}
-			// 加1
-			for (int i = result.length() - 1; i >= 0; i--) {
-				if (result.charAt(i) == '0') {
-					result.setCharAt(i, '1');
-					break;
-				} else {
-					result.setCharAt(i, '0');
-				}
-			}
+			result = oneAdder(negation(result)).substring(1);
 		}
 		return result.toString();
 	}
@@ -546,11 +530,9 @@ public class ALU {
 	public String integerDivision (String operand1, String operand2, int length) {
 		String result = "";
 		// 预处理
-		String xValue = integerTrueValue(operand1);
-		String yValue = integerTrueValue(operand2);
-		if (yValue.equals("0")) {
+		if (!operand2.contains("1")) {
 			return "NaN";
-		} else if (xValue.equals("0")) {
+		} else if (!operand1.contains("1")) {
 			while (result.length() < 2*length+1) {
 				result = result + "0";
 			}
@@ -624,21 +606,41 @@ public class ALU {
 	 * @return 长度为length+2的字符串表示的计算结果，其中第1位指示是否溢出（溢出为1，否则为0），第2位为符号位，后length位是相加结果
 	 */
 	public String signedAddition (String operand1, String operand2, int length) {
-		char signdiff = xor(operand1.charAt(0), operand2.charAt(0));
-		// 若为负数则取反
-		if (operand1.charAt(0) == '1') {
-			operand1 = negation(operand1);
+		// 若操作数的长度小于length则进行右移
+		char sign1 = operand1.charAt(0);
+		operand1 = operand1.substring(1);
+		while (operand1.length() < length + 4) {
+			operand1 = "0" + operand1;
 		}
-		if (operand2.charAt(0) == '1') {
-			operand2 = negation(operand2);
+		char sign2 = operand2.charAt(0);
+		operand2 = operand2.substring(1);
+		while (operand2.length() < length + 4) {
+			operand2 = "0" + operand2;
 		}
-		// 去除符号位
-		operand1.substring(1);
-		operand2.substring(1);
-		StringBuilder result = new StringBuilder();
-		result.append(adder(operand1, operand2, signdiff, length));
-		// TODO confused.
-		return result.toString();
+		String result;
+		char overflow = '0';
+		char resultSign;
+		if (sign1 == sign2) {
+			// 同号相加
+			resultSign = sign1;
+			result = adder(operand1, operand2, '0', length + 4).substring(1);
+			if (result.substring(0, 4).contains("1")) {
+				overflow = '1';
+			}
+			result = result.substring(4);
+		} else {
+			// 异号相减
+			operand2 = operand2.substring(0, 4) + oneAdder(negation(operand2)).substring(5);
+			result = adder(operand1, operand2, '0', length + 4).substring(1);
+			if (result.substring(0, 4).contains("1")) {
+				resultSign = sign1;
+			} else {
+				resultSign = not(sign1);
+				result = oneAdder(negation(result)).substring(1);
+			}
+			result = result.substring(4);
+		}
+		return overflow + "" + resultSign + result;
 	}
 	
 	/**
@@ -652,8 +654,86 @@ public class ALU {
 	 * @return 长度为2+eLength+sLength的字符串表示的相加结果，其中第1位指示是否指数上溢（溢出为1，否则为0），其余位从左到右依次为符号、指数（移码表示）、尾数（首位隐藏）。舍入策略为向0舍入
 	 */
 	public String floatAddition (String operand1, String operand2, int eLength, int sLength, int gLength) {
-		// TODO YOUR CODE HERE.
-		return null;
+		if (!operand1.substring(1).contains("1")) {
+			return "0" + operand2; // :)
+		} else if (!operand2.substring(1).contains("1")) {
+			return "0" + operand1; // :)
+		} else {
+			char sign1 = operand1.charAt(0);
+			char sign2 = operand2.charAt(0);
+			String exp1 = operand1.substring(1, 1 + eLength);
+			String exp2 = operand2.substring(1, 1 + eLength);
+			String frac1 = operand1.substring(1 + eLength);
+			String frac2 = operand2.substring(1 + eLength);
+			int expNum1 = Integer.parseInt(integerTrueValue("0" + exp1));
+			int expNum2 = Integer.parseInt(integerTrueValue("0" + exp2));
+			if (expNum1 == 0) {
+				expNum1++;
+				frac1 = "0" + frac1;
+			} else {
+				frac1 = "1" + frac1;
+			}
+			if (expNum2 == 0) {
+				expNum2++;
+				frac2 = "0" + frac2;
+			} else {
+				frac2 = "1" + frac2;
+			}
+			// 补全保护位
+			for (int i = 0; i < gLength; i++) {
+				frac1 = frac1 + "0";
+				frac2 = frac2 + "0";
+			}
+			int expNumResult = expNum1;
+			// 检查指数是否相等
+			if (expNum1 < expNum2) {
+				frac1 = logRightShift(frac1, expNum2 - expNum1);
+				expNumResult = expNum2;
+			} else if (expNum2 < expNum1) {
+				frac2 = logRightShift(frac2, expNum1 - expNum2);
+			}
+			if (!frac1.contains("1")) {
+				return "0" + operand2; // :)
+			} else if (!frac2.contains("1")) {
+				return "0" + operand1; // :)
+			}
+			int newLength = sLength + gLength + 1;
+			while (newLength % 4 != 0) {
+				newLength++;
+			}
+			// 分数相加
+			String addResult = signedAddition(sign1 + frac1, sign2 + frac2, newLength);
+			String fracResult = addResult.substring(addResult.length() - sLength - gLength - 2);
+			char signResult = addResult.charAt(1);
+			char expOverflow = '0';
+			// 判断结果是否为0
+			if (!fracResult.contains("1")) {
+				return "0" + floatRepresentation("0", eLength, sLength); // :)
+			}
+			// 判断分数溢出
+			if (fracResult.charAt(0) == '1') {
+				fracResult = logRightShift(fracResult, 1);
+				expNumResult++;
+				// 判断指数上溢
+				if (expNumResult >= (int) Math.pow(2, eLength) - 1) {
+					expOverflow = '1';
+				}
+			}
+			fracResult = fracResult.substring(1);
+			// 结果规格化
+			expNumResult -= fracResult.indexOf("1");
+			if (expNumResult <= 0) {
+				// 指数下溢，非规格化
+				expNumResult = 0;
+			} else {
+				// 规格化
+				fracResult = leftShift(fracResult, fracResult.indexOf("1"));
+			}
+			String expResult = integerRepresentation(Integer.toString(expNumResult), eLength);
+			// 舍入
+			fracResult = fracResult.substring(1, 1 + sLength);
+			return expOverflow + "" + signResult + expResult + fracResult; // :)
+		}
 	}
 	
 	/**

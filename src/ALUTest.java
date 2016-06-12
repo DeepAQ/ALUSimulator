@@ -7,7 +7,7 @@ public class ALUTest {
     public static void main(String[] args) {
         ALU alu = new ALU();
         Random rand = new Random();
-        for (int i = 0; i < 100; i++) {
+        /*for (int i = 0; i < 100; i++) {
             long randNum1 = rand.nextLong();
             long randNum2 = rand.nextInt();
             if (randNum2 == 0) continue;
@@ -22,7 +22,19 @@ public class ALUTest {
             String r2 = alu.integerTrueValue(result2.substring(64));
             System.out.println(randNum1 + "/" + randNum2 + " = " + q1 + "..." + r1 + " | " + q2 + "..." + r2
                     + " | " + (Long.toString(q1).equals(q2)&&Long.toString(r1).equals(r2)));
+        }*/
+        //System.out.println(alu.integerDivision(alu.integerRepresentation("-8", 4), alu.integerRepresentation("-1", 4), 4));
+        for (int i = 0; i < 100; i++) {
+            double randNum1 = rand.nextDouble();
+            double randNum2 = rand.nextDouble();
+            double result = randNum1 + randNum2;
+            String resultString = alu.ieee754(Double.toString(result), 64);
+            String result2 = alu.floatAddition(
+                    alu.ieee754(Double.toString(randNum1), 64),
+                    alu.ieee754(Double.toString(randNum2), 64),
+                    11, 52, 4
+            ).substring(1);
+            System.out.println(resultString + " | " + result2 + " | " + resultString.equals(result2));
         }
-        System.out.println(alu.integerDivision(alu.integerRepresentation("-8", 4), alu.integerRepresentation("-1", 4), 4));
     }
 }
