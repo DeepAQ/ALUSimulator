@@ -25,16 +25,17 @@ public class ALUTest {
         }*/
         //System.out.println(alu.integerDivision(alu.integerRepresentation("-8", 4), alu.integerRepresentation("-1", 4), 4));
         for (int i = 0; i < 100; i++) {
-            double randNum1 = rand.nextDouble();
-            double randNum2 = rand.nextDouble();
-            double result = randNum1 + randNum2;
+            double randNum1 = rand.nextDouble() * rand.nextInt(999);
+            double randNum2 = rand.nextDouble() * rand.nextInt(999);
+            double result = randNum1 - randNum2;
             String resultString = alu.ieee754(Double.toString(result), 64);
-            String result2 = alu.floatAddition(
+            String result2 = alu.floatSubtraction(
                     alu.ieee754(Double.toString(randNum1), 64),
                     alu.ieee754(Double.toString(randNum2), 64),
                     11, 52, 4
             ).substring(1);
-            System.out.println(resultString + " | " + result2 + " | " + resultString.equals(result2));
+            System.out.println(resultString.substring(0, 50).equals(result2.substring(0, 50)) + " | " + randNum1 + " " + randNum2 + " | " + resultString + " | " + result2);
         }
+
     }
 }

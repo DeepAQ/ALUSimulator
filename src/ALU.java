@@ -747,8 +747,9 @@ public class ALU {
 	 * @return 长度为2+eLength+sLength的字符串表示的相减结果，其中第1位指示是否指数上溢（溢出为1，否则为0），其余位从左到右依次为符号、指数（移码表示）、尾数（首位隐藏）。舍入策略为向0舍入
 	 */
 	public String floatSubtraction (String operand1, String operand2, int eLength, int sLength, int gLength) {
-		// TODO YOUR CODE HERE.
-		return null;
+		// 改变减数符号
+		operand2 = not(operand2.charAt(0)) + operand2.substring(1);
+		return floatAddition(operand1, operand2, eLength, sLength, gLength);
 	}
 	
 	/**
