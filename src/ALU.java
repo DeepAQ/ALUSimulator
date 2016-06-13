@@ -815,7 +815,7 @@ public class ALU {
 			String expResult = integerRepresentation(Integer.toString(expNumResult), eLength);
 			// 舍入
 			fracResult = fracResult.substring(1, 1 + sLength);
-			return expOverflow + "" + signResult + expResult + fracResult; // :)
+			return expOverflow + "" + signResult + expResult + fracResult;
 		}
 	}
 	
@@ -829,7 +829,63 @@ public class ALU {
 	 * @return 长度为2+eLength+sLength的字符串表示的相乘结果,其中第1位指示是否指数上溢（溢出为1，否则为0），其余位从左到右依次为符号、指数（移码表示）、尾数（首位隐藏）。舍入策略为向0舍入
 	 */
 	public String floatDivision (String operand1, String operand2, int eLength, int sLength) {
-		// TODO YOUR CODE HERE.
-		return null;
+		if (!operand1.substring(1).contains("1")) {
+			return "0" + floatRepresentation("0", eLength, sLength);
+		} else if (!operand2.substring(1).contains("1")) {
+			return "0" + floatRepresentation("Inf", eLength, sLength);
+		} else {
+			char signResult = xor(operand1.charAt(0), operand2.charAt(0));
+			String exp1 = operand1.substring(1, 1 + eLength);
+			String exp2 = operand2.substring(1, 1 + eLength);
+			String frac1 = operand1.substring(1 + eLength);
+			String frac2 = operand2.substring(1 + eLength);
+			int expNum1 = Integer.parseInt(integerTrueValue("0" + exp1));
+			int expNum2 = Integer.parseInt(integerTrueValue("0" + exp2));
+			if (expNum1 == 0) {
+				expNum1++;
+				frac1 = "0" + frac1;
+			} else {
+				frac1 = "1" + frac1;
+			}
+			if (expNum2 == 0) {
+				expNum2++;
+				frac2 = "0" + frac2;
+			} else {
+				frac2 = "1" + frac2;
+			}
+			int expNumResult = expNum1 - expNum2 + (int) Math.pow(2, eLength - 1) - 1;
+			int newLength = 2 + sLength;
+			while (newLength % 4 != 0) {
+				newLength++;
+			}
+			String fracResult = "";
+			for (int i = 0; i < 1 + sLength; i++) {
+				if (frac1.charAt(0) == frac2.charAt(0)) {
+					frac1 = integerSubtraction("0" + frac1, "0" + frac2, newLength);
+					frac1 = frac1.substring(frac1.length() - sLength - 1);
+					fracResult = fracResult + "1";
+				} else {
+					fracResult = fracResult + "0";
+				}
+				frac1 = frac1.substring(1) + "0";
+			}
+			char expOverflow = '0';
+			expNumResult = expNumResult - fracResult.indexOf("1");
+			// 判断指数上溢
+			if (expNumResult >= (int) Math.pow(2, eLength) - 1) {
+				expOverflow = '1';
+			}
+			if (expNumResult <= 0) {
+				// 指数下溢，非规格化
+				expNumResult = 0;
+			} else {
+				// 规格化
+				fracResult = leftShift(fracResult, fracResult.indexOf("1"));
+			}
+			String expResult = integerRepresentation(Integer.toString(expNumResult), eLength);
+			// 舍入
+			fracResult = fracResult.substring(1, 1 + sLength);
+			return expOverflow + "" + signResult + expResult + fracResult;
+		}
 	}
 }

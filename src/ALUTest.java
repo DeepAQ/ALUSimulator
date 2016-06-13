@@ -39,15 +39,15 @@ public class ALUTest {
         for (int i = 0; i < 100; i++) {
             double randNum1 = rand.nextDouble() * rand.nextInt(999);
             double randNum2 = rand.nextDouble() * rand.nextInt(999);
-            double result = randNum1 * randNum2;
+            double result = randNum1 / randNum2;
             String resultString = alu.ieee754(Double.toString(result), 64);
-            String result2 = alu.floatMultiplication(
+            String result2 = alu.floatDivision(
                     alu.ieee754(Double.toString(randNum1), 64),
                     alu.ieee754(Double.toString(randNum2), 64),
                     11, 52
             ).substring(1);
             System.out.println(resultString.substring(0, 50).equals(result2.substring(0, 50)) + " | " + randNum1 + " " + randNum2 + " | " + resultString + " | " + result2);
         }
-        System.out.println(alu.floatMultiplication("0100000000000", "0100010000000", 4, 8));
+        System.out.println(alu.floatDivision(alu.ieee754("0.4375", 32), alu.ieee754("0.5", 32), 8, 23));
     }
 }
