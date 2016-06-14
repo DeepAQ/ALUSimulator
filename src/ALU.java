@@ -470,9 +470,17 @@ public class ALU {
 	 * @return 长度为length+1的字符串表示的计算结果，其中第1位指示是否溢出（溢出为1，否则为0），后length位是相减结果
 	 */
 	public String integerSubtraction (String operand1, String operand2, int length) {
+		char overflow = '0';
 		// 对减数取反加一
-		operand2 = oneAdder(negation(operand2)).substring(1);
-		return adder(operand1, operand2, '0', length);
+		operand2 = oneAdder(negation(operand2));
+		if (operand2.charAt(0) == '1') {
+			overflow = '1';
+		}
+		String result = adder(operand1, operand2.substring(1), '0', length);
+		if (result.charAt(0) == '1') {
+			overflow = '1';
+		}
+		return overflow + result.substring(1);
 	}
 	
 	/**
