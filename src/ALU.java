@@ -317,12 +317,11 @@ public class ALU {
 	 */
 	public String ariRightShift (String operand, int n) {
 		StringBuilder result = new StringBuilder(operand);
-		int i = n;
 		char sign = operand.charAt(0);
-		while (i > 0) {
+		while (n > 0) {
 			result.deleteCharAt(result.length() - 1);
 			result.insert(0, sign);
-			i--;
+			n--;
 		}
 		return result.toString();
 	}
@@ -502,15 +501,24 @@ public class ALU {
 			operand2 = sign2 + operand2;
 		}
 		// 填充结果及Y
+		char overflow = '0';
 		String prod = integerRepresentation("0", length);
 		StringBuilder y = new StringBuilder(operand2 + "0");
 		for (int i = 0; i < length; i++) {
 			switch (y.charAt(y.length() - 1) - y.charAt(y.length() - 2)) {
 				case 1:
-					prod = integerAddition(prod, operand1, length).substring(1);
+					prod = integerAddition(prod, operand1, length);
+					if (prod.charAt(0) == '1') {
+						overflow = '1';
+					}
+					prod = prod.substring(1);
 					break;
 				case -1:
-					prod = integerSubtraction(prod, operand1, length).substring(1);
+					prod = integerSubtraction(prod, operand1, length);
+					if (prod.charAt(0) == '1') {
+						overflow = '1';
+					}
+					prod = prod.substring(1);
 					break;
 			}
 			// 右移
@@ -520,9 +528,8 @@ public class ALU {
 		}
 		y.deleteCharAt(y.length() - 1);
 		// 判断是否溢出
-		char overflow = '1';
-		if (ariRightShift(prod, length).equals(prod) && prod.charAt(0) == y.charAt(0)) {
-			overflow = '0';
+		if (!ariRightShift(prod, length).equals(prod) || prod.charAt(0) != y.charAt(0)) {
+			overflow = '1';
 		}
 		return overflow + y.toString();
 	}
@@ -862,12 +869,17 @@ public class ALU {
 				frac2 = "1" + frac2;
 			}
 			int expNumResult = expNum1 - expNum2 + (int) Math.pow(2, eLength - 1) - 1;
-			int newLength = 2 + sLength;
+			int newLength = 2 + 2 * sLength;
 			while (newLength % 4 != 0) {
 				newLength++;
 			}
-			String fracResult = "";
-			for (int i = 0; i < 1 + sLength; i++) {
+			// 左移被除数分数
+			for (int i = 0; i < sLength; i++) {
+				frac1 = frac1 + "0";
+			}
+			String fracResult = integerDivision("0" + frac1, "0" + frac2, newLength).substring(1, 1 + newLength);
+			fracResult = fracResult.substring(fracResult.length() - sLength - 1);
+			/*for (int i = 0; i < 1 + sLength; i++) {
 				if (frac1.charAt(0) == frac2.charAt(0)) {
 					frac1 = integerSubtraction("0" + frac1, "0" + frac2, newLength);
 					frac1 = frac1.substring(frac1.length() - sLength - 1);
@@ -876,7 +888,7 @@ public class ALU {
 					fracResult = fracResult + "0";
 				}
 				frac1 = frac1.substring(1) + "0";
-			}
+			}*/
 			char expOverflow = '0';
 			expNumResult = expNumResult - fracResult.indexOf("1");
 			// 判断指数上溢
