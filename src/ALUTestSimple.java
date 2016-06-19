@@ -63,7 +63,7 @@ public class ALUTestSimple {
 
     @org.junit.Test
     public void claAdder() throws Exception {
-        assertEquals(alu.claAdder("1001", "0001", '1'), "01010");
+        assertEquals(alu.claAdder("1001", "0001", '1'), "01011");
     }
 
     @org.junit.Test
@@ -104,7 +104,7 @@ public class ALUTestSimple {
     @org.junit.Test
     public void floatAddition() throws Exception {
         assertEquals(alu.floatAddition("00111111010100000",
-                "00111111001000000", 8, 8, 4), "001000000001110000");
+                "00111111001000000", 8, 8, 4), "000111111101110000");
     }
 
     @org.junit.Test
